@@ -15,12 +15,31 @@ import Home from './src/components/Home';
 import Cart from './src/components/Cart';
 import Favorite from './src/components/Favorite';
 import Profile from './src/components/Profile';
+import { colors } from './env';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const App = () => {
   const [selctedScreen, setSelectedScreen] = useState(0);
+  const bottomItem = [
+    {
+      icon: Home_Icon,
+      title: 'Home',
+    },
+    {
+      icon: Cart_icon,
+      title: 'Cart',
+    },
+    {
+      icon: Heart_icon,
+      title: 'Favorite',
+    },
+    {
+      icon: User_icon,
+      title: 'Profile',
+    },
+  ];
 
   return (
     <View style={Styles.mainView}>
@@ -34,65 +53,25 @@ const App = () => {
         <Profile />
       )}
       <View style={Styles.bottomNav}>
-        <TouchableOpacity
-          onPress={() => setSelectedScreen(0)}
-          style={[Styles.itemView,]}>
-          <View
-            style={{
-              backgroundColor: selctedScreen === 0 ? 'black' : null,
-              borderRadius: 100,
-              padding: 8,
-              
-            }}>
-            <Home_Icon height={selctedScreen === 0 ? 35 : 22} width={ selctedScreen === 0 ? 32 : 22} stroke={'white'} />
-          </View>
-          <Text style={Styles.title}>Home</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setSelectedScreen(1)}
-          style={[Styles.itemView]}>
-          <View
-            style={{
-              backgroundColor: selctedScreen === 1 ? 'black' : null,
-              borderRadius: 100,
-              padding: 8,
-            }}>
-            <Cart_icon height={selctedScreen === 1 ? 35 : 22} width={ selctedScreen === 1 ? 32 : 22} stroke={'white'} />
-          </View>
-
-          <Text style={Styles.title}>Cart</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setSelectedScreen(2)}
-          style={[Styles.itemView]}>
-          <View
-            style={{
-              backgroundColor: selctedScreen === 2 ? 'black' : null,
-              borderRadius: 100,
-              padding: 8,
-            }}>
-            <Heart_icon height={selctedScreen === 2 ? 35 : 22} width={ selctedScreen === 2 ? 32 : 22}  stroke={'white'} />
-          </View>
-
-          <Text style={Styles.title}>favorite</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setSelectedScreen(3)}
-          style={[Styles.itemView]}>
-          <View
-            style={{
-              backgroundColor: selctedScreen === 3 ? 'black' : null,
-              borderRadius: 100,
-              padding: 8,
-            }}>
-            <User_icon height={selctedScreen === 3 ? 35 : 22} width={ selctedScreen === 3 ? 32 : 22} stroke={'white'}/>
-          </View>
-
-          <Text style={Styles.title}>Profile</Text>
-        </TouchableOpacity>
+        {bottomItem.map((item, index) => (
+          <TouchableOpacity
+            style={[Styles.itemView]}
+            onPress={() => setSelectedScreen(index)}
+            key={index}>
+            <View
+              style={{
+                backgroundColor: selctedScreen === index ? 'white' : null,
+                borderRadius: 30,
+                padding: 15,
+                position: selctedScreen === index ? 'absolute' : null,
+                bottom: selctedScreen === index ? 10 : null,
+              }}>
+              <item.icon height={22} width={22} stroke={selctedScreen===index?'black':'white'} />
+            </View>
+            <Text style={[Styles.title, {top:selctedScreen===index?10:0}]}>{item.title}</Text>
+          </TouchableOpacity>
+          
+        ))}
       </View>
     </View>
   );
@@ -110,24 +89,23 @@ const Styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     flexDirection: 'row',
-    backgroundColor: '#f0cd4f',
+    backgroundColor: colors.PRIMARY_COLOR,
     position: 'absolute',
-    bottom: 5,
     width: width - 20,
-    height: (height * 8) / 100,
+    bottom: 5,
     alignSelf: 'center',
     borderRadius: 30,
+    height:height*7/100
   },
   itemView: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent:'space-around',
     alignItems: 'center',
-    gap: 5,
-    borderRadius: 20,
     padding: 5,
+    position:'relative',
   },
   title: {
     fontSize: 10,
-    color: 'white',
+    color: 'white'
   },
 });
