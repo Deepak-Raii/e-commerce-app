@@ -1,6 +1,6 @@
 const New_Arrivals = [
     {
-        title:"Jean",
+        title:"Jeans",
         image:require("./images/jeans1.jpeg"),
         price:1300,
         rating:4
@@ -12,7 +12,7 @@ const New_Arrivals = [
         rating:4.1
     },
     {
-        title:"Shuit",
+        title:"Jacket",
         image:require("./images/men-suit1.jpg"),
         price:3200,
         rating:4.3
@@ -71,4 +71,22 @@ const Category = [
 
 ]
 
-export {New_Arrivals, Category};
+
+const getProducts = async()=>{
+    const data = await fetch('https://fakestoreapi.com/products');
+    const jsonData = await data.json();
+    return jsonData;
+}
+
+const getJewelery = async()=>{
+    const data = await fetch('https://fakestoreapi.com/products/category/jewelery',{
+        method:'Get',
+        headers:{
+            'Content-Type':"application/json"
+        }
+    });
+    const jsonData = await data.json();
+    return jsonData;
+} 
+
+export {New_Arrivals, Category, getProducts, getJewelery};

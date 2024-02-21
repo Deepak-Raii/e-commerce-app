@@ -6,50 +6,77 @@ import {
   Dimensions,
   FlatList,
   StyleSheet,
+  TouchableHighlight,
 } from 'react-native';
-import React from 'react';
-import {New_Arrivals} from '../Items';
-import { colors } from '../../env';
+import React, {useEffect, useState} from 'react';
+import {colors} from '../../env';
+import {getJewelery, getProducts} from '../Items';
+import { useNavigation } from '@react-navigation/native';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-const CustomCard = () => {
+const CustomCard = props => {
+  const [data, setData] = useState([]);
+  const [header, setHeader] = useState('');
+  const navigation = useNavigation();
+  useEffect(() => {
+    products();
+    getJewelery();
+  }, []);
+
+  const products = () => {
+    console.log('function called');
+    if (props.header === 'New Arrivals') {
+      setHeader(props.header);
+      getProducts().then(datas => setData(datas));
+    } else if (props.header === 'Jewelery') {
+      setHeader(props.header);
+      getJewelery().then(datas => setData(datas));
+    }
+  };
+
+  const handleProduct =()=>{
+    navigation.navigate("ProductInfo")
+  }
   return (
     <View>
-      <Text style={Styles.header}>New Arrivals</Text>
+      <Text style={Styles.header}>{header}</Text>
       {
         <FlatList
           style={{width: '92%', alignSelf: 'center'}}
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={New_Arrivals}
+          data={data}
           renderItem={(item, index) => (
-            <TouchableOpacity key={index} style={Styles.card}>
-              <Image
-                source={item.item.image}
-                style={{
-                  height: (height * 15) / 100,
-                  width: (width * 50) / 100,
-                  borderRadius: 10,
-                  objectFit: 'fill',
-                }}
-              />
-              <Text
-                style={{
-                  fontWeight: 'bold',
-                  color: 'black',
-                  marginTop: 5,
-                  marginLeft: 5,
-                }}>
-                {item.item.title}
+            <TouchableOpacity
+              onPress={handleProduct}
+              activeOpacity={0.8}
+              key={index}
+              style={Styles.card}>
+              <Image source={{uri: item.item.image}} style={Styles.cardImage} />
+              <Text style={Styles.title}>
+                {item.item.title.length > 20
+                  ? `${item.item.title.slice(0, 20)} ...`
+                  : item.item.title}
               </Text>
-              <Text style={{fontWeight: 'bold', color: 'black', marginLeft: 5}}>
+              <Text style={{fontWeight: 'bold', color: 'gray', marginLeft: 5}}>
                 ₹{item.item.price}
               </Text>
-              <Text style={{color: 'gray', marginLeft: 5}}>
-                ⭐ {item.item.rating}
-              </Text>
+              <View
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                }}>
+                <Text style={{color: 'gray', marginLeft: 5}}>
+                  ⭐ {item.item.rating.rate}
+                </Text>
+                <Text style={{color: 'gray', marginRight: 5}}>
+                  ({item.item.rating.count})
+                </Text>
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -67,13 +94,30 @@ const Styles = StyleSheet.create({
     backgroundColor: 'whitesmoke',
     margin: 5,
     borderRadius: 10,
+    shadowOffset: {width: 0, height: 5},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowColor: 'gray',
+    elevation: 3,
+    backgroundColor: 'white',
   },
   header: {
     fontSize: 16,
     fontWeight: 'bold',
     width: '90%',
     alignSelf: 'center',
-    marginTop: 15,
-    color:colors.PRIMARY_COLOR
+    color: colors.PRIMARY_COLOR,
+  },
+  cardImage: {
+    height: (height * 10) / 100,
+    width: (width * 40) / 100,
+    borderRadius: 10,
+    objectFit: 'fill',
+  },
+  title: {
+    fontWeight: 'bold',
+    color: 'gray',
+    marginTop: 5,
+    marginLeft: 5,
   },
 });
