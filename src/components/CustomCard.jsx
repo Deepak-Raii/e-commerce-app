@@ -36,8 +36,8 @@ const CustomCard = props => {
     }
   };
 
-  const handleProduct =()=>{
-    navigation.navigate("ProductInfo")
+  const handleProduct =(data)=>{
+    navigation.navigate("Product Info",{responseData:data})
   }
   return (
     <View>
@@ -50,7 +50,7 @@ const CustomCard = props => {
           data={data}
           renderItem={(item, index) => (
             <TouchableOpacity
-              onPress={handleProduct}
+              onPress={()=>handleProduct(item.item)}
               activeOpacity={0.8}
               key={index}
               style={Styles.card}>

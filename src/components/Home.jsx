@@ -9,28 +9,17 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import User_icon from '../images/user_icon.svg';
 import Bell_icon from '../images/bell.svg';
 import CustomCard from './CustomCard';
 import {Category} from '../Items';
 import {colors} from '../../env';
-import {New_Arrivals} from '../Items';
-import {getProducts} from '../Items';
-import { useNavigation } from '@react-navigation/native';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const Home = () => {
-  const [product, setProduct] = useState([]);
-  const navigation = useNavigation();
-  useEffect(()=>{
-    setTimeout(()=>{
-// navigation.navigate("ProductInfo")
-    },3000)
-
-  },[])
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={Styles.mainView}>

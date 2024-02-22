@@ -1,12 +1,305 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
+import {colors} from '../../env';
+import Heart from '../images/heart1';
+import {useDispatch} from 'react-redux';
+import {addItem, removeItem} from '../store/slices';
 
-const Product_Info = () => {
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
+
+const Product_Info = ({route}) => {
+  const {responseData} = route.params;
+  const [details, setDetails] = useState([]);
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [isfav, setIsFav] = useState(true);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setDetails(responseData);
+  }, []);
+
+  const productColor = [
+    {color: 'red'},
+    {color: 'yellow'},
+    {color: 'gray'},
+    {color: 'pink'},
+    {color: 'green'},
+    {color: 'black'},
+    {color: 'orange'},
+  ];
+
+  const sizes = [
+    {size: 'S'},
+    {size: 'M'},
+    {size: 'L'},
+    {size: 'XL'},
+    {size: 'XXL'},
+  ];
+
+  const handleCart = details => {
+    console.log('fav icon clicked...');
+    setIsFav(!isfav);
+
+    if (isfav === true) {
+      console.log('status : ', isfav);
+      dispatch(addItem(details));
+    } else {
+      console.log('staus in false ', isfav);
+      dispatch(removeItem(details));
+    }
+  };
+
   return (
-    <View>
-      <Text>Product_Info</Text>
-    </View>
-  )
-}
+    <>
+      <ScrollView>
+        <View style={Styles.card}>
+          <TouchableOpacity
+            onPress={() => handleCart(details)}
+            activeOpacity={0.9}
+            style={Styles.heartView}>
+            <Heart
+              height={22}
+              width={22}
+              stroke={!isfav ? '' : 'black'}
+              fill={!isfav ? 'red' : null}
+            />
+          </TouchableOpacity>
+          <Image
+            source={{uri: details ? details.image : ''}}
+            style={Styles.image}
+          />
+          <View style={Styles.titleView}>
+            <Text style={Styles.title}>{details ? details.title : '--'}</Text>
+            <Text style={Styles.price}>{`$${
+              details ? details.price : '--'
+            }`}</Text>
+          </View>
 
-export default Product_Info
+          <View style={Styles.ratingView}>
+            <Text style={Styles.ratingText}>{`⭐ ${details ? '4.2' : '--'} (${
+              details ? '170' : '--'
+            })`}</Text>
+            <View style={Styles.countView}>
+              <TouchableOpacity style={Styles.addSub}>
+                <Text>+</Text>
+              </TouchableOpacity>
+              <Text>count</Text>
+              <TouchableOpacity style={Styles.addSub}>
+                <Text>-</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              marginTop: 10,
+              borderTopWidth: 0.2,
+              borderTopColor: 'gray',
+              paddingTop: 10,
+            }}>
+            <FlatList
+              style={{display: 'flex', width: '100%'}}
+              data={productColor}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({item, index}) => (
+                <TouchableOpacity
+                  onPress={() => setSelectedColor(index)}
+                  key={index}
+                  style={[
+                    Styles.colorView,
+                    {
+                      backgroundColor: item.color,
+                      borderWidth: selectedColor === index ? 2 : 0,
+                      borderColor: selectedColor === index ? 'purple' : '',
+                    },
+                  ]}></TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              width: '100%',
+              marginTop: 10,
+            }}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={sizes}
+              renderItem={({item, index}) => (
+                <TouchableOpacity
+                  onPress={() => setSelectedSize(index)}
+                  style={[
+                    Styles.sizeView,
+                    {
+                      backgroundColor:
+                        selectedSize === index
+                          ? colors.PRIMARY_COLOR
+                          : 'whitesmoke',
+                    },
+                  ]}>
+                  <Text
+                    style={{color: selectedSize === index ? 'white' : 'black'}}>
+                    {item.size}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
+          <View style={Styles.descriptionView}>
+            <Text style={{textAlign: 'left', fontWeight: 'bold'}}>
+              Description
+            </Text>
+            <Text>{details.description}</Text>
+          </View>
+        </View>
+      </ScrollView>
+      <TouchableOpacity
+        style={[Styles.cartButton,{backgroundColor:!isfav?'gray':colors.PRIMARY_COLOR}]}
+        onPress={() => handleCart(details)}
+        activeOpacity={0.8}>
+        <Text style={{color: 'white', fontWeight: 'bold'}}>
+          {!isfav ? 'Remove From Cart' : 'Add To Cart'}
+        </Text>
+      </TouchableOpacity>
+    </>
+  );
+};
+
+export default Product_Info;
+
+const Styles = StyleSheet.create({
+  card: {
+    width: (width * 90) / 100,
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 10,
+    gap: 10,
+    paddingBottom: 200,
+  },
+  image: {
+    height: (height * 30) / 100,
+    width: (width * 90) / 100,
+    borderRadius: 15,
+    objectFit: 'fill',
+  },
+  titleView: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'left',
+    width: '60%',
+  },
+  price: {
+    color: colors.PRIMARY_COLOR,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  ratingView: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    width: '100%',
+    gap: 10,
+  },
+  ratingText: {
+    fontSize: 16,
+  },
+  countView: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    borderRadius: 20,
+    backgroundColor: 'whitesmoke',
+    paddingHorizontal: 3,
+    paddingVertical: 2,
+  },
+  colorView: {
+    height: 25,
+    width: 25,
+    marginRight: 10,
+    opacity: 0.7,
+    borderRadius: 30,
+  },
+  addSub: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    height: 20,
+    width: 20,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sizeView: {
+    marginRight: 10,
+    borderRadius: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    width: 40,
+  },
+  descriptionView: {
+    width: '100%',
+    marginTop: 10,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  heartView: {
+    height: 35,
+    width: 35,
+    borderRadius: 50,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 10,
+    top: 5,
+    backgroundColor: 'white',
+    zIndex: 1000,
+  },
+  cartButton: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: (Dimensions.get('window').height * 7) / 100,
+    borderRadius: 30,
+    elevation: 2,
+    width: '90%',
+    position: 'absolute',
+    top: (height * 80) / 100,
+    zIndex: 0,
+    alignSelf: 'center',
+  },
+});
