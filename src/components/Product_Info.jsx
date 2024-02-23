@@ -20,6 +20,7 @@ const width = Dimensions.get('window').width;
 const Product_Info = ({route}) => {
   const {responseData} = route.params;
   const [details, setDetails] = useState([]);
+  const [stars, setStar] = useState([]);
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [isfav, setIsFav] = useState(true);
@@ -27,7 +28,9 @@ const Product_Info = ({route}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setDetails(responseData);
+     setDetails(responseData);
+     handleStar();
+    
   }, []);
 
   const productColor = [
@@ -61,9 +64,24 @@ const Product_Info = ({route}) => {
     }
   };
 
+  const handleStar = async() => {
+    console.log("details : ", details);
+    const starLength = Math.round(details.rating);
+    
+    console.log("rating : ", details.rating);
+    console.log("length : ", starLength)
+    const starArr = [];
+    for (var i = 0; i < starLength; i++) {
+      starArr.push(i);
+    }
+    setStar(starArr);
+    console.log("saved : ",stars)
+  };
+
+
   return (
     <>
-      <ScrollView>
+      <ScrollView style={{backgroundColor:'white'}}>
         <View style={Styles.card}>
           <TouchableOpacity
             onPress={() => handleCart(details)}
@@ -76,21 +94,34 @@ const Product_Info = ({route}) => {
               fill={!isfav ? 'red' : null}
             />
           </TouchableOpacity>
-          <Image
-            source={{uri: details ? details.image : ''}}
-            style={Styles.image}
+          <FlatList
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={details.images}
+            renderItem={({item, index}) => (
+              <Image
+                key={index}
+                source={{uri: details ? item : ''}}
+                style={Styles.image}
+              />
+            )}
           />
+
           <View style={Styles.titleView}>
             <Text style={Styles.title}>{details ? details.title : '--'}</Text>
-            <Text style={Styles.price}>{`$${
-              details ? details.price : '--'
-            }`}</Text>
           </View>
 
           <View style={Styles.ratingView}>
-            <Text style={Styles.ratingText}>{`⭐ ${details ? '4.2' : '--'} (${
-              details ? '170' : '--'
-            })`}</Text>
+            <View style={{display: 'flex', flexDirection: 'row'}}>
+              {
+                stars.length>0 ? stars.map((item, index)=>(
+                  <Text key={index}>⭐</Text>
+                )):(<Text>--</Text>)
+              }
+              <Text>({details.rating})</Text>
+              <Text> {details.stock} ratings</Text>
+            </View>
             <View style={Styles.countView}>
               <TouchableOpacity style={Styles.addSub}>
                 <Text>+</Text>
@@ -101,6 +132,8 @@ const Product_Info = ({route}) => {
               </TouchableOpacity>
             </View>
           </View>
+
+          <Text style={{textAlign:'left',width:'100%', fontSize:18, fontWeight:'bold', color:'green'}}>₹{details.price}</Text>
 
           <View
             style={{
@@ -145,6 +178,7 @@ const Product_Info = ({route}) => {
               data={sizes}
               renderItem={({item, index}) => (
                 <TouchableOpacity
+                key={index}
                   onPress={() => setSelectedSize(index)}
                   style={[
                     Styles.sizeView,
@@ -172,14 +206,31 @@ const Product_Info = ({route}) => {
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity
-        style={[Styles.cartButton,{backgroundColor:!isfav?'gray':colors.PRIMARY_COLOR}]}
-        onPress={() => handleCart(details)}
-        activeOpacity={0.8}>
-        <Text style={{color: 'white', fontWeight: 'bold'}}>
-          {!isfav ? 'Remove From Cart' : 'Add To Cart'}
-        </Text>
-      </TouchableOpacity>
+
+      <View style={Styles.buttonView}>
+        <TouchableOpacity
+          style={[
+            Styles.cartButton,
+            {
+              borderColor: !isfav ? 'gray' : colors.PRIMARY_COLOR,
+              backgroundColor: !isfav ? 'gray' : colors.PRIMARY_COLOR,
+            },
+          ]}
+          onPress={() => handleCart(details)}
+          activeOpacity={0.8}>
+          <Text style={{color: 'white', fontWeight: 'bold'}}>
+            {!isfav ? 'Remove From Cart' : 'Add To Cart'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            Styles.cartButton,
+          ]}
+          activeOpacity={0.8}>
+          <Text style={{color: 'black', fontWeight: 'bold'}}>Buy now</Text>
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
@@ -198,7 +249,7 @@ const Styles = StyleSheet.create({
     paddingBottom: 200,
   },
   image: {
-    height: (height * 30) / 100,
+    height: (height * 60) / 100,
     width: (width * 90) / 100,
     borderRadius: 15,
     objectFit: 'fill',
@@ -228,7 +279,7 @@ const Styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     width: '100%',
-    gap: 10,
+    // gap: 10,
   },
   ratingText: {
     fontSize: 16,
@@ -289,17 +340,26 @@ const Styles = StyleSheet.create({
     backgroundColor: 'white',
     zIndex: 1000,
   },
+  buttonView: {
+    width: '90%',
+    position: 'absolute',
+    top: (height * 84) / 100,
+    zIndex: 0,
+    alignSelf: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   cartButton: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: (Dimensions.get('window').height * 7) / 100,
-    borderRadius: 30,
-    elevation: 2,
-    width: '90%',
-    position: 'absolute',
-    top: (height * 80) / 100,
-    zIndex: 0,
-    alignSelf: 'center',
+    height: (Dimensions.get('window').height * 6) / 100,
+    // borderRadius: 30,
+    // elevation: 2,
+    width: '48%',
+    borderWidth: 1,
+    borderColor: colors.PRIMARY_COLOR,
   },
 });

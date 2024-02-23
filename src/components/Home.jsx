@@ -9,7 +9,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import User_icon from '../images/user_icon.svg';
 import Bell_icon from '../images/bell.svg';
 import CustomCard from './CustomCard';
@@ -34,7 +34,7 @@ const Home = () => {
               fontWeight: '800',
               fontSize: 20,
             }}>
-            WE U
+            Mee U
           </Text>
           <View style={Styles.right_header}>
             {/* <Search_icon height={26} width={26} stroke={colors.PRIMARY_COLOR} /> */}
@@ -74,13 +74,13 @@ const Home = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={Category}
-          renderItem={(item, index) => (
+          renderItem={({item, index}) => (
             <TouchableOpacity
               activeOpacity={0.8}
               key={index}
               style={Styles.categoryView}>
               <Image
-                source={item.item.image}
+                source={item.image}
                 style={{
                   height: 50,
                   width: 50,
@@ -91,12 +91,12 @@ const Home = () => {
                   shadowRadius: 3,
                 }}
               />
-              <Text>{item.item.title}</Text>
+              <Text>{item.title}</Text>
             </TouchableOpacity>
           )}
         />
-        <CustomCard header={'New Arrivals'} />
-        <CustomCard header={'Jewelery'} />
+        <CustomCard header={'Mens'} />
+        <CustomCard header={'Womens'} />
       </View>
     </ScrollView>
   );

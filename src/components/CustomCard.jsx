@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {colors} from '../../env';
-import {getJewelery, getProducts} from '../Items';
+import {getItems, getProducts} from '../Items';
 import { useNavigation } from '@react-navigation/native';
 
 const width = Dimensions.get('window').width;
@@ -22,17 +22,17 @@ const CustomCard = props => {
   const navigation = useNavigation();
   useEffect(() => {
     products();
-    getJewelery();
   }, []);
 
   const products = () => {
     console.log('function called');
-    if (props.header === 'New Arrivals') {
+    if (props.header === 'Mens') {
       setHeader(props.header);
-      getProducts().then(datas => setData(datas));
-    } else if (props.header === 'Jewelery') {
+      getItems('mens-shirts').then(datas => setData(datas.products));
+    } 
+    else if (props.header === 'Womens') {
       setHeader(props.header);
-      getJewelery().then(datas => setData(datas));
+      getItems("womens-dresses").then(datas => setData(datas.products));
     }
   };
 
@@ -54,7 +54,7 @@ const CustomCard = props => {
               activeOpacity={0.8}
               key={index}
               style={Styles.card}>
-              <Image source={{uri: item.item.image}} style={Styles.cardImage} />
+              <Image source={{uri: item.item.thumbnail}} style={Styles.cardImage} />
               <Text style={Styles.title}>
                 {item.item.title.length > 20
                   ? `${item.item.title.slice(0, 20)} ...`
@@ -71,10 +71,10 @@ const CustomCard = props => {
                   flexDirection: 'row',
                 }}>
                 <Text style={{color: 'gray', marginLeft: 5}}>
-                  ⭐ {item.item.rating.rate}
+                  ⭐ {item.item.rating}
                 </Text>
                 <Text style={{color: 'gray', marginRight: 5}}>
-                  ({item.item.rating.count})
+                  ({item.item.stock})
                 </Text>
               </View>
             </TouchableOpacity>
@@ -109,7 +109,7 @@ const Styles = StyleSheet.create({
     color: colors.PRIMARY_COLOR,
   },
   cardImage: {
-    height: (height * 10) / 100,
+    height: (height * 15) / 100,
     width: (width * 40) / 100,
     borderRadius: 10,
     objectFit: 'fill',

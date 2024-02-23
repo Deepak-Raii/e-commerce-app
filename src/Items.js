@@ -38,7 +38,7 @@ const Category = [
 
     },
     {
-        title:"Shuit",
+        title:"Suit",
         image:require("./images/men-suit1.jpg"),
 
     },
@@ -73,13 +73,24 @@ const Category = [
 
 
 const getProducts = async()=>{
-    const data = await fetch('https://fakestoreapi.com/products');
+    const data = await fetch('https://dummyjson.com/products');
     const jsonData = await data.json();
     return jsonData;
 }
 
-const getJewelery = async()=>{
-    const data = await fetch('https://fakestoreapi.com/products/category/jewelery',{
+// const getJewelery = async()=>{
+//     const data = await fetch('https://fakestoreapi.com/products/category/jewelery',{
+//         method:'Get',
+//         headers:{
+//             'Content-Type':"application/json"
+//         }
+//     });
+//     const jsonData = await data.json();
+//     return jsonData;
+// } 
+
+const getItems = async(param)=>{
+    const data = await fetch(`https://dummyjson.com/products/category/${param}`,{
         method:'Get',
         headers:{
             'Content-Type':"application/json"
@@ -89,4 +100,4 @@ const getJewelery = async()=>{
     return jsonData;
 } 
 
-export {New_Arrivals, Category, getProducts, getJewelery};
+export {New_Arrivals, Category, getProducts, getItems};
