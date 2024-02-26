@@ -8,51 +8,45 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {colors} from '../../env';
+import { useNavigation } from '@react-navigation/native';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const Cart = () => {
+  const navigation = useNavigation();
   console.log('in cart');
   const data = useSelector(state => state.cart.value);
   const [cart, setCart] = useState([]);
-  // const [stars, setStar] = useState([]);
   useEffect(() => {
     setCart(data);
-    // console.log('data in cart : ', data);
   }, [data]);
 
-  // useEffect(() => {
-  //   handleStar();
-  // },[]);
+  const handleItems = (item) => {
+    navigation.navigate("Product Info", {responseData:item})
+    
+  }
 
-  // handleStar = () => {
-  //   for (var i = 0; i < data.length; i++) {
-  //     console.log("star1::",stars);
-  //     stars.push([]);
-  //     const rateLength = Math.round(data[i].rating.rate);
-  //     for (var j = 0; j < rateLength; j++) {
-  //       stars[i].push(j)
-  //     }
-  //   }
-  //   console.log('stars :: ', stars);
-  // };
   return (
     <View style={Styles.mainView}>
-      <FlatList
+      {cart.length>0 ? (
+        <FlatList
+        style={{paddingBottom:100,}}
         data={cart}
         renderItem={({item, index}) => (
-          <TouchableOpacity style={Styles.card} key={index}>
-            <View style={{width: '25%'}}>
-              <Image source={{uri: item.image}} style={Styles.image} />
-              <Text>{`⭐${item.rating.rate} (${item.rating.count})`}</Text>
+          <TouchableOpacity onPress={()=>handleItems(item)} activeOpacity={0.7} style={Styles.card} key={index}>
+            <View style={{width: '25%',flexWrap:'wrap'}}>
+              <Image source={{uri: item.thumbnail}} style={Styles.image} />
+              
             </View>
 
-            <View style={{width: '50%'}}>
+            <View style={{width: '50%', alignSelf:'flex-start',paddingLeft:6}}>
+              <Text style={{textAlign: 'left', fontWeight:'bold'}}>{item.brand}</Text>
               <Text style={{textAlign: 'left'}}>{item.title}</Text>
+              <Text>{`⭐${item.rating} ( ${item.stock} )`}</Text>
             </View>
 
             <View
@@ -63,14 +57,9 @@ const Cart = () => {
                 alignItems: 'center',
                 gap:10
               }}>
-              <View style={Styles.countView}>
-                <TouchableOpacity style={Styles.addSubBtn}>
-                  <Text style={[Styles.text, {color: 'black'}]}>+</Text>
-                </TouchableOpacity>
-                <Text style={[Styles.text, {color: 'black'}]}>0</Text>
-                <TouchableOpacity style={Styles.addSubBtn}>
-                  <Text style={[Styles.text, {color: 'black'}]}>-</Text>
-                </TouchableOpacity>
+
+              <View>
+                <Text style={{color:'green', fontWeight:'bold'}}>₹{item.price}</Text>
               </View>
               <TouchableOpacity
                 style={{
@@ -85,6 +74,12 @@ const Cart = () => {
           </TouchableOpacity>
         )}
       />
+      ) : (
+        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+          <Text>No item in cart...</Text>
+        </View>
+      )
+      }
     </View>
   );
 };
@@ -96,8 +91,8 @@ const Styles = StyleSheet.create({
     flex: 1,
   },
   image: {
-    height: 60,
-    width: 60,
+    height: 80,
+    width: 80,
     objectFit: 'fill',
     marginBottom:5
   },

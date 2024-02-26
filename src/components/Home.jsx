@@ -9,17 +9,22 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import User_icon from '../images/user_icon.svg';
 import Bell_icon from '../images/bell.svg';
 import CustomCard from './CustomCard';
-import {Category} from '../Items';
 import {colors} from '../../env';
+import {category} from '../Items';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const Home = () => {
+  const [Category, setCategory] = useState([]);
+  useEffect(() => {
+    category().then(data => setCategory(data));
+  }, []);
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={Styles.mainView}>
@@ -37,7 +42,6 @@ const Home = () => {
             Mee U
           </Text>
           <View style={Styles.right_header}>
-            {/* <Search_icon height={26} width={26} stroke={colors.PRIMARY_COLOR} /> */}
             <Bell_icon height={26} width={26} stroke={colors.PRIMARY_COLOR} />
           </View>
         </View>
@@ -79,19 +83,7 @@ const Home = () => {
               activeOpacity={0.8}
               key={index}
               style={Styles.categoryView}>
-              <Image
-                source={item.image}
-                style={{
-                  height: 50,
-                  width: 50,
-                  borderRadius: 50,
-                  shadowColor: 'black',
-                  shadowOffset: {height: 10, width: 10},
-                  shadowOpacity: 1,
-                  shadowRadius: 3,
-                }}
-              />
-              <Text>{item.title}</Text>
+              <Text>{item}</Text>
             </TouchableOpacity>
           )}
         />
@@ -108,7 +100,7 @@ const Styles = StyleSheet.create({
   mainView: {
     flex: 1,
     gap: 10,
-    paddingBottom:100
+    paddingBottom: 100,
   },
   headerView: {
     display: 'flex',
@@ -136,16 +128,21 @@ const Styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.PRIMARY_COLOR,
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   textInput: {
     width: '90%',
-    paddingVertical: 10,
+    paddingVertical: 7,
     marginTop: 10,
     backgroundColor: 'whitesmoke',
-    borderRadius: 10,
+    borderRadius: 50,
     alignSelf: 'center',
-    paddingHorizontal: 10,
-    elevation: 2,
+    paddingHorizontal: 20,
+    // elevation: 2,
     borderWidth: 1,
     borderColor: colors.PRIMARY_COLOR,
   },

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,18 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  TouchableHighlight,
 } from 'react-native';
 import {colors} from '../../env';
 import Heart from '../images/heart1';
 import {useDispatch} from 'react-redux';
-import {addItem, removeItem} from '../store/slices';
+import {
+  addItem,
+  increaseItemCount,
+  removeItem,
+  decreaseItemCount,
+} from '../store/slices';
+import {useNavigation} from '@react-navigation/native';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -24,14 +31,19 @@ const Product_Info = ({route}) => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [isfav, setIsFav] = useState(true);
+  const [count, setCount] = useState(0);
+
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-     setDetails(responseData);
-     handleStar();
-    
+    handleStar();
   }, []);
+
+  useMemo(() => {
+    return setDetails(responseData);
+  }, [responseData]);
 
   const productColor = [
     {color: 'red'},
@@ -64,24 +76,32 @@ const Product_Info = ({route}) => {
     }
   };
 
-  const handleStar = async() => {
-    console.log("details : ", details);
+  const handleStar = async () => {
     const starLength = Math.round(details.rating);
-    
-    console.log("rating : ", details.rating);
-    console.log("length : ", starLength)
     const starArr = [];
     for (var i = 0; i < starLength; i++) {
       starArr.push(i);
     }
     setStar(starArr);
-    console.log("saved : ",stars)
   };
 
+  const handleItem = title => {
+    if (title === 'add') {
+      dispatch(increaseItemCount(1));
+      setCount(count >= 0 ? count + 1 : null);
+    } else if (title === 'remove') {
+      dispatch(decreaseItemCount(1));
+      setCount(count > 0 ? count - 1 : null);
+    }
+  };
+
+  const handlePurchase = () => {
+    navigation.replace('Purchase', {responseData:details});
+  };
 
   return (
     <>
-      <ScrollView style={{backgroundColor:'white'}}>
+      <ScrollView style={{backgroundColor: 'white'}}>
         <View style={Styles.card}>
           <TouchableOpacity
             onPress={() => handleCart(details)}
@@ -114,26 +134,39 @@ const Product_Info = ({route}) => {
 
           <View style={Styles.ratingView}>
             <View style={{display: 'flex', flexDirection: 'row'}}>
-              {
-                stars.length>0 ? stars.map((item, index)=>(
-                  <Text key={index}>⭐</Text>
-                )):(<Text>--</Text>)
-              }
+              {stars.length > 0 ? (
+                stars.map((item, index) => <Text key={index}>⭐</Text>)
+              ) : (
+                <Text>--</Text>
+              )}
               <Text>({details.rating})</Text>
               <Text> {details.stock} ratings</Text>
             </View>
             <View style={Styles.countView}>
-              <TouchableOpacity style={Styles.addSub}>
+              <TouchableOpacity
+                onPress={() => handleItem('add')}
+                style={Styles.addSub}>
                 <Text>+</Text>
               </TouchableOpacity>
-              <Text>count</Text>
-              <TouchableOpacity style={Styles.addSub}>
+              <Text>{count > 0 ? count : 0}</Text>
+              <TouchableOpacity
+                onPress={() => handleItem('remove')}
+                style={Styles.addSub}>
                 <Text>-</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <Text style={{textAlign:'left',width:'100%', fontSize:18, fontWeight:'bold', color:'green'}}>₹{details.price}</Text>
+          <Text
+            style={{
+              textAlign: 'left',
+              width: '100%',
+              fontSize: 18,
+              fontWeight: 'bold',
+              color: 'green',
+            }}>
+            ₹{details.price}
+          </Text>
 
           <View
             style={{
@@ -178,7 +211,7 @@ const Product_Info = ({route}) => {
               data={sizes}
               renderItem={({item, index}) => (
                 <TouchableOpacity
-                key={index}
+                  key={index}
                   onPress={() => setSelectedSize(index)}
                   style={[
                     Styles.sizeView,
@@ -213,23 +246,23 @@ const Product_Info = ({route}) => {
             Styles.cartButton,
             {
               borderColor: !isfav ? 'gray' : colors.PRIMARY_COLOR,
-              backgroundColor: !isfav ? 'gray' : colors.PRIMARY_COLOR,
+              borderWidth: 1,
+              backgroundColor: 'white',
             },
           ]}
           onPress={() => handleCart(details)}
-          activeOpacity={0.8}>
-          <Text style={{color: 'white', fontWeight: 'bold'}}>
+          activeOpacity={0.9}>
+          <Text style={{color: 'black', fontWeight: 'bold'}}>
             {!isfav ? 'Remove From Cart' : 'Add To Cart'}
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            Styles.cartButton,
-          ]}
-          activeOpacity={0.8}>
-          <Text style={{color: 'black', fontWeight: 'bold'}}>Buy now</Text>
-        </TouchableOpacity>
+        <TouchableHighlight
+          onPress={handlePurchase}
+          underlayColor="lightblue"
+          style={[Styles.cartButton]}>
+          <Text style={{color: 'white', fontWeight: 'bold'}}>Buy now</Text>
+        </TouchableHighlight>
       </View>
     </>
   );
@@ -341,9 +374,9 @@ const Styles = StyleSheet.create({
     zIndex: 1000,
   },
   buttonView: {
-    width: '90%',
+    width: '100%',
     position: 'absolute',
-    top: (height * 84) / 100,
+    bottom: 0,
     zIndex: 0,
     alignSelf: 'center',
     display: 'flex',
@@ -356,10 +389,7 @@ const Styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: (Dimensions.get('window').height * 6) / 100,
-    // borderRadius: 30,
-    // elevation: 2,
-    width: '48%',
-    borderWidth: 1,
-    borderColor: colors.PRIMARY_COLOR,
+    width: '50%',
+    backgroundColor: colors.PRIMARY_COLOR,
   },
 });

@@ -78,16 +78,16 @@ const getProducts = async()=>{
     return jsonData;
 }
 
-// const getJewelery = async()=>{
-//     const data = await fetch('https://fakestoreapi.com/products/category/jewelery',{
-//         method:'Get',
-//         headers:{
-//             'Content-Type':"application/json"
-//         }
-//     });
-//     const jsonData = await data.json();
-//     return jsonData;
-// } 
+const category = async()=>{
+    const data = await fetch('https://dummyjson.com/products/categories',{
+        method:'Get',
+        headers:{
+            'Content-Type':"application/json"
+        }
+    });
+    const jsonData = await data.json();
+    return jsonData;
+} 
 
 const getItems = async(param)=>{
     const data = await fetch(`https://dummyjson.com/products/category/${param}`,{
@@ -100,4 +100,4 @@ const getItems = async(param)=>{
     return jsonData;
 } 
 
-export {New_Arrivals, Category, getProducts, getItems};
+export {New_Arrivals, Category, getProducts, getItems, category};
