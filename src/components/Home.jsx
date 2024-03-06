@@ -31,15 +31,12 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Kya hai : ", searchedItem)
     if (searchedItem !== null && searchedItem !== '') {
       searchProducts(searchedItem).then(data => {
         setShowCategoryItem(data.products);
       });
     } else {
-      console.log("else called")
       setShowCategoryItem(null);
-      console.log("show", showCategoryItem)
     }
   }, [searchedItem]);
   
@@ -58,7 +55,7 @@ const Home = () => {
               fontWeight: '800',
               fontSize: 20,
             }}>
-            Mee U
+            XYZ
           </Text>
           <View style={Styles.right_header}>
             <Bell_icon height={26} width={26} stroke={colors.PRIMARY_COLOR} />
